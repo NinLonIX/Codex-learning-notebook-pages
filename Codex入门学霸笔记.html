@@ -895,9 +895,16 @@
   .summary-title { margin-bottom: 0.35rem; }
   .badge { font-size: 0.82rem; padding: 0.12rem 0.42rem; }
 
+  .return-orb { position: fixed; top: 22px; right: 24px; z-index: 50; width: 78px; height: 78px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 1px solid rgba(126,151,201,.72); border-radius: 50%; color: #315d9d; background: radial-gradient(circle at 31% 25%, rgba(255,255,255,.95) 0 5px, rgba(255,255,255,.2) 6px, transparent 18px), radial-gradient(circle at 58% 64%, rgba(167,199,243,.58), rgba(211,224,251,.38) 46%, rgba(255,255,255,.62)); box-shadow: 0 0 0 6px rgba(149,175,224,.14), 0 8px 20px rgba(38,67,116,.24), inset 0 0 0 3px rgba(255,255,255,.58), inset -8px -10px 16px rgba(93,128,187,.17); font-family: 'Patrick Hand', 'Microsoft YaHei', sans-serif; font-size: 1.02rem; line-height: 1.02; text-align: center; text-decoration: none; transform: rotate(-3deg); transition: transform .22s ease, box-shadow .22s ease, filter .22s ease; }
+  .return-orb::before { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(255,255,255,.62); border-radius: 50%; pointer-events: none; }
+  .return-orb::after { content: '✦'; position: absolute; top: 10px; right: 16px; color: rgba(255,255,255,.9); font-size: .72rem; }
+  .return-orb:hover, .return-orb:focus-visible { transform: rotate(0deg) translateY(-3px) scale(1.04); box-shadow: 0 0 0 7px rgba(149,175,224,.2), 0 12px 25px rgba(38,67,116,.3), inset 0 0 0 3px rgba(255,255,255,.68), inset -8px -10px 16px rgba(93,128,187,.17); filter: saturate(1.08); }
+  @media (max-width: 600px) { .return-orb { top: 14px; right: 14px; width: 66px; height: 66px; font-size: .92rem; } .return-orb::before { inset: 6px; } }
+
 </style>
 </head>
 <body>
+<a class="return-orb" href="魔法书网页.html" aria-label="返回目录"><span>返回</span><span>目录</span></a>
 
 <div class="desk">
   <div class="notebook">
