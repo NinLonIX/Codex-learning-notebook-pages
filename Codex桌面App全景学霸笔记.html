@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Codex 桌面 App 全景｜学霸笔记</title>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Zeyada&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/lucide-static@latest/font/lucide.min.css" rel="stylesheet">
+<style>
+  :root {
+    --paper-bg: #fdf6e3;
+    --paper-dark: #f5ecd3;
+    --paper-line: #e8e0cc;
+    --ink-black: #2c2c2c;
+    --ink-red: #c0392b;
+    --ink-blue: #2980b9;
+    --ink-green: #27ae60;
+    --ink-purple: #8e44ad;
+    --ink-orange: #e67e22;
+    --highlight-yellow: rgba(255, 235, 59, 0.35);
+    --highlight-pink: rgba(255, 105, 180, 0.25);
+    --highlight-green: rgba(46, 204, 113, 0.2);
+    --highlight-orange: rgba(255, 152, 0, 0.2);
+    --tape: rgba(255, 255, 255, 0.45);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #3d3d3d;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    font-family: 'Kalam', cursive;
+    overflow-x: hidden;
+  }
+
+  .desk {
+    position: relative;
+    width: 100%;
+    max-width: 920px;
+  }
+
+  .notebook {
+    position: relative;
+    background: var(--paper-bg);
+    background-image:
+      linear-gradient(90deg, transparent 79px, #e8d5b5 79px, #e8d5b5 81px, transparent 81px),
+      linear-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 2.4rem;
+    background-position: 0 0, 0 0;
+    border-radius: 4px;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,0.15),
+      0 4px 8px rgba(0,0,0,0.12),
+      0 8px 16px rgba(0,0,0,0.1),
+      0 16px 32px rgba(0,0,0,0.08),
+      15px 25px 40px rgba(0,0,0,0.15);
+    padding: 3rem 2.5rem 3rem 6rem;
+    line-height: 2.4rem;
+    color: var(--ink-black);
+    transform: rotate(-0.3deg);
+    animation: paperFloat 6s ease-in-out infinite;
+  }
+
+  @keyframes paperFloat {
+    0%, 100% { transform: rotate(-0.3deg) translateY(0); }
+    50% { transform: rotate(-0.1deg) translateY(-3px); }
+  }
+
+  /* ===== 螺旋装订 ===== */
+  .spiral-holes {
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 2rem 0;
+  }
+
+  .hole {
+    width: 14px;
+    height: 14px;
+    background: #3d3d3d;
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5);
+    position: relative;
+  }
+
+  .hole::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 6px;
+    background: linear-gradient(180deg, #888 0%, #bbb 50%, #888 100%);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  /* ===== 装饰元素 ===== */
+  .tape {
+    position: absolute;
+    width: 120px;
+    height: 35px;
+    background: var(--tape);
+    opacity: 0.6;
+    transform: rotate(-3deg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    backdrop-filter: blur(1px);
+  }
+
+  .tape.top-left {
+    top: -12px;
+    left: 40px;
+    transform: rotate(-4deg);
+  }
+
+  .tape.top-right {
+    top: -10px;
+    right: 60px;
+    transform: rotate(3deg);
+    width: 100px;
+  }
+
+  .paperclip {
+    position: absolute;
+    top: 40px;
+    right: 30px;
+    width: 30px;
+    height: 70px;
+    border: 3px solid #b0b0b0;
+    border-radius: 0 0 15px 15px;
+    border-top: none;
+    transform: rotate(-5deg);
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.15);
+    z-index: 10;
+  }
+
+  .paperclip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 6px;
+    width: 12px;
+    height: 25px;
+    border: 3px solid #b0b0b0;
+    border-bottom: none;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .coffee-stain {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid rgba(139, 90, 43, 0.12);
+    box-shadow:
+      0 0 0 8px rgba(139, 90, 43, 0.06),
+      0 0 0 16px rgba(139, 90, 43, 0.03);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .coffee-stain.one { bottom: 60px; right: 40px; }
+  .coffee-stain.two { top: 200px; left: 100px; opacity: 0.5; }
+
+  .folded-corner {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, transparent 50%, var(--paper-dark) 50%);
+    border-bottom-right-radius: 4px;
+    box-shadow: -2px -2px 4px rgba(0,0,0,0.08);
+  }
+
+  .doodle {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  /* ===== 标题系统 ===== */
+  .title {
+    font-family: 'Zeyada', cursive;
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: var(--ink-black);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    position: relative;
+    display: inline-block;
+  }
+
+  .title-underline {
+    position: absolute;
+    bottom: 2px;
+    left: -5px;
+    right: -10px;
+    height: 8px;
+    background: var(--highlight-yellow);
+    z-index: -1;
+    border-radius: 4px;
+    transform: rotate(-1deg);
+  }
+
+  .subtitle {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.3rem;
+    color: var(--ink-blue);
+    margin-bottom: 1.5rem;
+    transform: rotate(-0.5deg);
+  }
+
+  .date-badge {
+    display: inline-block;
+    font-size: 0.95rem;
+    color: var(--ink-blue);
+    margin-bottom: 1.5rem;
+    transform: rotate(-1deg);
+  }
+
+  /* ===== 段落系统 ===== */
+  .section {
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .section-title {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink-red);
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    position: relative;
+  }
+
+  .section-title .marker-underline {
+    position: absolute;
+    bottom: 0;
+    left: -3px;
+    right: -5px;
+    height: 4px;
+    background: var(--ink-red);
+    opacity: 0.3;
+    border-radius: 2px;
+  }
+
+  .content {
+    font-size: 1.15rem;
+    text-align: justify;
+    position: relative;
+  }
+
+  /* ===== 文字高亮 ===== */
+  .highlight {
+    background: var(--highlight-yellow);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  .highlight-pink {
+    background: var(--highlight-pink);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  .highlight-green {
+    background: var(--highlight-green);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  .highlight-orange {
+    background: var(--highlight-orange);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  /* ===== 彩色文字 ===== */
+  .red-text { color: var(--ink-red); font-weight: 700; }
+  .blue-text { color: var(--ink-blue); }
+  .green-text { color: var(--ink-green); }
+  .purple-text { color: var(--ink-purple); }
+  .orange-text { color: var(--ink-orange); font-weight: 700; }
+
+  /* ===== 下划线样式 ===== */
+  .underline-wavy {
+    text-decoration: underline;
+    text-decoration-style: wavy;
+    text-decoration-color: var(--ink-red);
+    text-underline-offset: 3px;
+  }
+
+  .double-underline {
+    border-bottom: 3px double var(--ink-red);
+    padding-bottom: 1px;
+  }
+
+  /* ===== 代码术语 ===== */
+  .code-term {
+    font-family: 'Courier New', monospace;
+    font-size: 0.95em;
+    background: rgba(0,0,0,0.06);
+    padding: 0 4px;
+    border-radius: 3px;
+    border-bottom: 1.5px solid var(--ink-purple);
+  }
+
+  /* ===== 代码块 ===== */
+  .code-block {
+    display: block;
+    margin: 0.8rem 0;
+    padding: 0.8rem 1rem;
+    background: #2d2d2d;
+    color: #f8f8f2;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.2);
+    transform: rotate(0.3deg);
+    position: relative;
+  }
+
+  .code-block::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 15px;
+    width: 50px;
+    height: 12px;
+    background: rgba(255,255,255,0.3);
+    border: 1px solid rgba(0,0,0,0.1);
+    transform: rotate(-2deg);
+  }
+
+  .code-comment { color: #75715e; }
+  .code-keyword { color: #66d9ef; }
+  .code-string { color: #a6e22e; }
+
+  /* ===== 标签系统 ===== */
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    background: var(--ink-red);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-right: 0.3rem;
+  }
+
+  .badge.blue { background: var(--ink-blue); }
+  .badge.green { background: var(--ink-green); }
+  .badge.purple { background: var(--ink-purple); }
+  .badge.orange { background: var(--ink-orange); }
+
+  /* ===== 版本/年份徽章 ===== */
+  .version-badge, .year-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, rgba(192,57,43,0.1) 0%, rgba(231,76,60,0.05) 100%);
+    border: 2px solid var(--ink-red);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    color: var(--ink-red);
+    font-weight: 700;
+    margin: 0.5rem 0;
+    transform: rotate(-1deg);
+  }
+
+  .version-number, .year-number {
+    font-size: 1.4rem;
+    font-family: 'Zeyada', cursive;
+  }
+
+  /* ===== 警告框 ===== */
+  .big-warning {
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,235,59,0.15),
+      rgba(255,235,59,0.15) 10px,
+      rgba(255,235,59,0.25) 10px,
+      rgba(255,235,59,0.25) 20px
+    );
+    border: 2px solid var(--ink-red);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink-red);
+    transform: rotate(0.5deg);
+    position: relative;
+  }
+
+  .big-warning::before,
+  .big-warning::after {
+    content: '!!!';
+    position: absolute;
+    font-size: 1rem;
+    color: var(--ink-red);
+    opacity: 0.6;
+  }
+
+  .big-warning::before { top: 5px; left: 10px; }
+  .big-warning::after { bottom: 5px; right: 10px; }
+
+  /* ===== 紧急警告框 ===== */
+  .urgent-box {
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(231,76,60,0.1),
+      rgba(231,76,60,0.1) 10px,
+      rgba(231,76,60,0.2) 10px,
+      rgba(231,76,60,0.2) 20px
+    );
+    border: 3px solid var(--ink-red);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ink-red);
+    transform: rotate(-0.5deg);
+    position: relative;
+  }
+
+  /* ===== 便签 ===== */
+  .side-note {
+    position: absolute;
+    right: -40px;
+    top: 0;
+    width: 140px;
+    padding: 0.6rem;
+    background: #fff9c4;
+    border: 1px solid #f0e68c;
+    box-shadow: 3px 3px 8px rgba(0,0,0,0.12);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--ink-black);
+    transform: rotate(4deg);
+    z-index: 5;
+  }
+
+  .side-note::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 14px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+
+  .side-note.left {
+    right: auto;
+    left: 150px;
+    transform: rotate(-3deg);
+    background: #ffcdd2;
+    border-color: #ef9a9a;
+  }
+
+  .side-note.blue {
+    background: #bbdefb;
+    border-color: #90caf9;
+    transform: rotate(2deg);
+  }
+
+  .side-note.green {
+    background: #c8e6c9;
+    border-color: #a5d6a7;
+    transform: rotate(-2deg);
+  }
+
+  .side-note.purple {
+    background: #e1bee7;
+    border-color: #ce93d8;
+    transform: rotate(3deg);
+  }
+
+  /* ===== 流程图 ===== */
+  .flow-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.8rem 0;
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.4);
+    border: 2px dashed var(--ink-blue);
+    border-radius: 8px;
+    transform: rotate(0.5deg);
+  }
+
+  .flow-item {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    background: #fff;
+    border: 1.5px solid var(--ink-black);
+    border-radius: 6px;
+    font-size: 1rem;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  .flow-arrow {
+    font-size: 1.3rem;
+    color: var(--ink-red);
+  }
+
+  /* ===== 对比框 ===== */
+  .compare-box {
+    margin: 1rem 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(41,128,185,0.08) 0%, rgba(52,152,219,0.05) 100%);
+    border-left: 4px solid var(--ink-blue);
+    border-radius: 0 8px 8px 0;
+    transform: rotate(-0.2deg);
+  }
+
+  .compare-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+
+  .compare-row:last-child { margin-bottom: 0; }
+
+  .compare-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    height: 28px;
+    background: var(--ink-blue);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .compare-label.old { background: var(--ink-purple); }
+  .compare-label.new { background: var(--ink-green); }
+
+  /* ===== 攻击链/步骤 ===== */
+  .attack-flow, .attack-path {
+    margin: 1rem 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(192,57,43,0.08) 0%, rgba(231,76,60,0.05) 100%);
+    border-left: 4px solid var(--ink-red);
+    border-radius: 0 8px 8px 0;
+    transform: rotate(-0.3deg);
+  }
+
+  .attack-step, .attack-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+    font-size: 1.1rem;
+  }
+
+  .attack-step:last-child, .attack-row:last-child { margin-bottom: 0; }
+
+  .step-num, .attack-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    background: var(--ink-red);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== 问题框 ===== */
+  .question-box {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(41,128,185,0.08);
+    border: 2px solid var(--ink-blue);
+    border-radius: 8px;
+    position: relative;
+    transform: rotate(0.3deg);
+  }
+
+  .question-box::before {
+    content: '?';
+    position: absolute;
+    top: -15px;
+    left: 15px;
+    width: 30px;
+    height: 30px;
+    background: var(--ink-blue);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  /* ===== 安全状态框 ===== */
+  .safe-box {
+    margin: 1rem 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(39,174,96,0.08) 0%, rgba(46,204,113,0.05) 100%);
+    border-left: 4px solid var(--ink-green);
+    border-radius: 0 8px 8px 0;
+    transform: rotate(-0.2deg);
+  }
+
+  .safe-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .safe-row:last-child { margin-bottom: 0; }
+
+  .safe-check {
+    color: var(--ink-green);
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  /* ===== 修复方案框 ===== */
+  .fix-box, .update-box {
+    margin: 1rem 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(41,128,185,0.08) 0%, rgba(52,152,219,0.05) 100%);
+    border-left: 4px solid var(--ink-blue);
+    border-radius: 0 8px 8px 0;
+    transform: rotate(0.2deg);
+  }
+
+  .fix-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .fix-row:last-child { margin-bottom: 0; }
+
+  .fix-icon {
+    color: var(--ink-blue);
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  /* ===== 配置框 ===== */
+  .config-box {
+    margin: 1rem 0;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(135deg, rgba(142,68,173,0.08) 0%, rgba(155,89,182,0.05) 100%);
+    border-left: 4px solid var(--ink-purple);
+    border-radius: 0 8px 8px 0;
+    transform: rotate(0.2deg);
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+
+  .config-tag {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    background: var(--ink-purple);
+    color: #fff;
+    border-radius: 3px;
+    font-size: 0.85rem;
+  }
+
+  /* ===== 菜单路径 ===== */
+  .menu-path {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border: 2px solid #bdbdbd;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    transform: rotate(-0.5deg);
+  }
+
+  /* ===== 网格布局 ===== */
+  .os-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin: 0.8rem 0;
+    padding: 0.8rem;
+    background: rgba(255,255,255,0.4);
+    border: 2px dashed var(--ink-red);
+    border-radius: 8px;
+    transform: rotate(0.3deg);
+  }
+
+  .os-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.3rem;
+    background: #fff;
+    border: 1.5px solid var(--ink-black);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    text-align: center;
+  }
+
+  .os-item.danger {
+    border-color: var(--ink-red);
+    color: var(--ink-red);
+    font-weight: 700;
+  }
+
+  /* ===== 总结框 ===== */
+  .summary-box {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(41,128,185,0.08) 0%, rgba(52,152,219,0.05) 100%);
+    border: 2px solid var(--ink-blue);
+    border-radius: 8px;
+    transform: rotate(0.3deg);
+  }
+
+  .summary-title {
+    font-family: 'Patrick Hand', cursive;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink-blue);
+    margin-bottom: 0.8rem;
+    text-align: center;
+  }
+
+  /* ===== 信任三角 ===== */
+  .trust-triangle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+
+  .trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    background: #fff;
+    border: 2px solid var(--ink-black);
+    border-radius: 8px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+    min-width: 100px;
+  }
+
+  .trust-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+  }
+
+  .trust-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink-red);
+  }
+
+  /* ===== 分割线 ===== */
+  .divider {
+    margin: 2rem 0;
+    text-align: center;
+    position: relative;
+  }
+
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ink-red), transparent);
+  }
+
+  .divider-text {
+    display: inline-block;
+    padding: 0 1rem;
+    background: var(--paper-bg);
+    position: relative;
+    font-family: 'Zeyada', cursive;
+    font-size: 1.6rem;
+    color: var(--ink-red);
+    font-weight: 700;
+  }
+
+  /* ===== 标记符号 ===== */
+  .check-mark { color: var(--ink-green); font-weight: 700; }
+  .cross-mark { color: var(--ink-red); font-weight: 700; }
+  .star-mark { color: var(--ink-red); font-size: 1.3rem; vertical-align: middle; }
+
+  /* ===== 入场动画 ===== */
+  .write-in {
+    opacity: 0;
+    transform: translateY(8px);
+    animation: writeIn 0.6s ease forwards;
+  }
+
+  @keyframes writeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ===== 响应式 ===== */
+  @media (max-width: 768px) {
+    .notebook {
+      padding: 2rem 1.5rem 2rem 4rem;
+      background-position: 0 0, 0 0;
+      background-image:
+        linear-gradient(90deg, transparent 59px, #e8d5b5 59px, #e8d5b5 61px, transparent 61px),
+        linear-gradient(var(--paper-line) 1px, transparent 1px);
+    }
+    .title { font-size: 2.2rem; }
+    .content { font-size: 1rem; }
+    .side-note, .side-note.left, .side-note.blue, .side-note.green, .side-note.purple {
+      position: relative;
+      right: auto;
+      left: auto;
+      width: 100%;
+      margin: 0.5rem 0;
+      transform: rotate(1deg);
+    }
+    .os-grid { grid-template-columns: repeat(2, 1fr); }
+    .trust-triangle { flex-direction: column; }
+    .spiral-holes { left: 12px; width: 40px; }
+    .hole { width: 10px; height: 10px; }
+    .hole::after { width: 22px; height: 5px; }
+  }
+
+  /* ===== 本笔记的内容密度微调 ===== */
+  .notebook { padding-top: 2.6rem; padding-bottom: 2.6rem; }
+  .section { margin-bottom: 1.2rem; }
+  .content { font-size: 0.98rem; line-height: 1.58rem; }
+  .content ul { margin: 0.22rem 0 0.22rem 1.2rem; padding-left: 1rem; }
+  .content li { margin: 0.08rem 0; }
+  .section-title { margin-bottom: 0.22rem; }
+  .flow-box { margin: 0.52rem 0; padding: 0.52rem; gap: 0.32rem; }
+  .flow-item { padding: 0.28rem 0.48rem; font-size: 0.88rem; }
+  .flow-arrow { font-size: 0.98rem; }
+  .compare-box, .safe-box, .big-warning, .summary-box, .code-block, .config-box, .attack-flow { margin: 0.52rem 0; }
+  .compare-row { gap: 0.48rem; margin-bottom: 0.34rem; font-size: 0.91rem; line-height: 1.4rem; }
+  .compare-label { min-width: 5.35rem; padding: 0.13rem 0.36rem; font-size: 0.84rem; }
+  .os-grid { gap: 0.38rem; margin: 0.52rem 0; }
+  .os-item { padding: 0.34rem 0.23rem; font-size: 0.83rem; line-height: 1.1rem; }
+  .code-block, .config-box { font-size: 0.84rem; line-height: 1.32rem; padding: 0.68rem 0.86rem; }
+  .summary-box { padding: 0.82rem 0.98rem; }
+  .summary-title { margin-bottom: 0.24rem; }
+
+  .return-orb { position: fixed; top: 22px; right: 24px; z-index: 50; width: 78px; height: 78px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 1px solid rgba(126,151,201,.72); border-radius: 50%; color: #315d9d; background: radial-gradient(circle at 31% 25%, rgba(255,255,255,.95) 0 5px, rgba(255,255,255,.2) 6px, transparent 18px), radial-gradient(circle at 58% 64%, rgba(167,199,243,.58), rgba(211,224,251,.38) 46%, rgba(255,255,255,.62)); box-shadow: 0 0 0 6px rgba(149,175,224,.14), 0 8px 20px rgba(38,67,116,.24), inset 0 0 0 3px rgba(255,255,255,.58), inset -8px -10px 16px rgba(93,128,187,.17); font-family: 'Patrick Hand', 'Microsoft YaHei', sans-serif; font-size: 1.02rem; line-height: 1.02; text-align: center; text-decoration: none; transform: rotate(-3deg); transition: transform .22s ease, box-shadow .22s ease, filter .22s ease; }
+  .return-orb::before { content: ''; position: absolute; inset: 8px; border: 1px solid rgba(255,255,255,.62); border-radius: 50%; pointer-events: none; }
+  .return-orb::after { content: '✦'; position: absolute; top: 10px; right: 16px; color: rgba(255,255,255,.9); font-size: .72rem; }
+  .return-orb:hover, .return-orb:focus-visible { transform: rotate(0deg) translateY(-3px) scale(1.04); box-shadow: 0 0 0 7px rgba(149,175,224,.2), 0 12px 25px rgba(38,67,116,.3), inset 0 0 0 3px rgba(255,255,255,.68), inset -8px -10px 16px rgba(93,128,187,.17); filter: saturate(1.08); }
+  @media (max-width: 600px) { .return-orb { top: 14px; right: 14px; width: 66px; height: 66px; font-size: .92rem; } .return-orb::before { inset: 6px; } }
+
+</style>
+</head>
+<body>
+<a class="return-orb" href="魔法书网页.html" aria-label="返回目录"><span>返回</span><span>目录</span></a>
+
+<div class="desk">
+  <div class="notebook">
+    <div class="spiral-holes">
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+      <div class="hole"></div><div class="hole"></div><div class="hole"></div>
+    </div>
+
+    <div class="tape top-left"></div>
+    <div class="tape top-right"></div>
+    <div class="paperclip"></div>
+    <div class="coffee-stain one"></div>
+    <div class="coffee-stain two"></div>
+    <div class="folded-corner"></div>
+    <div class="doodle" style="top:78px;right:76px;font-size:2rem;transform:rotate(14deg);opacity:0.12;"><i class="lucide-layout-dashboard"></i></div>
+
+    <div class="title write-in" style="animation-delay:0.1s">
+      Codex 桌面 App 全景
+      <div class="title-underline"></div>
+    </div>
+    <div class="subtitle write-in" style="animation-delay:0.3s">
+      并行线程 × Worktree 隔离 × 可视化审阅 × 自动化工作台
+    </div>
+    <div class="date-badge write-in" style="animation-delay:0.4s">
+      来源：<a href="https://coding.stormzhang.ai/codex/07-desktop-app" target="_blank" rel="noreferrer">AI 编程指南 · 07 桌面 App 全景</a> ｜ 更新 2026.06.20
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:0.5s">
+        01 · 先认清定位：它不是 CLI 的简化版
+        <div class="marker-underline"></div>
+      </div>
+      <div class="summary-box write-in" style="animation-delay:0.6s">
+        <div class="summary-title">桌面 App = 为并行和可视化打造的代码工作台</div>
+        <div class="content">它和 CLI、IDE 扩展使用同一个 Codex，共享 <span class="code-term">AGENTS.md</span>、MCP 和 Skills；差别在于把多个线程、项目、审阅和自动化集中到一个窗口。</div>
+      </div>
+      <div class="flow-box write-in" style="animation-delay:0.7s">
+        <span class="flow-item">多个线程</span><span class="flow-arrow">+</span>
+        <span class="flow-item">隔离环境</span><span class="flow-arrow">+</span>
+        <span class="flow-item">图形审阅</span><span class="flow-arrow">&rarr;</span>
+        <span class="flow-item">并行工作台</span>
+      </div>
+      <div class="content write-in" style="animation-delay:0.8s">
+        适合同时修 bug、补测试、跑长任务，或边改代码边在内置浏览器里看效果。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:1.0s">
+        02 · 平台与登录：两个桌面平台，Linux 先用 CLI
+        <div class="marker-underline"></div>
+      </div>
+      <div class="os-grid write-in" style="animation-delay:1.1s">
+        <span class="os-item"><strong>macOS Apple Silicon</strong><br>下载默认包</span>
+        <span class="os-item"><strong>macOS Intel</strong><br>选择 Intel build</span>
+        <span class="os-item"><strong>Windows</strong><br>Microsoft Store / winget</span>
+        <span class="os-item danger"><strong>Linux</strong><br>暂无桌面 App，先用 CLI</span>
+      </div>
+      <div class="compare-box write-in" style="animation-delay:1.2s">
+        <div class="compare-row"><span class="compare-label new">推荐登录</span><span>ChatGPT 账号：桌面 App 功能更完整，适合日常和云端能力。</span></div>
+        <div class="compare-row"><span class="compare-label old">API key</span><span>部分功能可能受限；遇到云端能力变灰，先检查登录方式。</span></div>
+      </div>
+      <div class="big-warning write-in" style="animation-delay:1.3s">
+        Mac 先确认 Apple Silicon / Intel；Linux 没有漏装组件，是官方暂未提供桌面 App。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:1.5s">
+        03 · 三栏心智模型：左边去哪，中间干活，右边验收
+        <div class="marker-underline"></div>
+      </div>
+      <div class="flow-box write-in" style="animation-delay:1.6s">
+        <span class="flow-item">左边栏：项目 / 线程</span><span class="flow-arrow">&rarr;</span>
+        <span class="flow-item">中间：对话 / 执行</span><span class="flow-arrow">&rarr;</span>
+        <span class="flow-item">右边：Diff / 终端 / 预览</span>
+      </div>
+      <div class="compare-box write-in" style="animation-delay:1.7s">
+        <div class="compare-row"><span class="compare-label new">左边栏</span><span>新线程、搜索、插件、Automations、Projects、Chats。</span></div>
+        <div class="compare-row"><span class="compare-label">中间区</span><span>对话流、输入框、模型选择、权限选择、Local / Worktree / Cloud 模式。</span></div>
+        <div class="compare-row"><span class="compare-label old">右边面板</span><span>Diff 审阅、共享工作区的内置终端、网页 / 文件 / 图片预览。</span></div>
+      </div>
+      <div class="side-note blue write-in" style="animation-delay:1.8s">
+        Project 能绑定文件夹并改代码；普通 Chat 不绑定项目，适合研究、规划和调插件。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:2.0s">
+        04 · 三种运行模式：Local / Worktree / Cloud
+        <div class="marker-underline"></div>
+      </div>
+      <div class="os-grid write-in" style="animation-delay:2.1s">
+        <span class="os-item"><strong>Local</strong><br>本机当前目录<br>日常开发、立即见结果</span>
+        <span class="os-item"><strong>Worktree</strong><br>本机隔离副本<br>并行任务不互相覆盖</span>
+        <span class="os-item danger"><strong>Cloud</strong><br>OpenAI 云端沙箱<br>长任务后台运行</span>
+      </div>
+      <div class="content write-in" style="animation-delay:2.2s">
+        同一项目要并行多个任务时优先 <span class="highlight">Worktree</span>。它依赖 Git，只继承 Git 中的文件；<span class="code-term">.env</span>、<span class="code-term">node_modules</span> 等被忽略的内容不会自动带过去。
+      </div>
+      <div class="config-box write-in" style="animation-delay:2.3s">
+        <span class="config-tag">Worktree 记忆点</span><br>
+        Git 仓库是前提 ｜ 每个任务一份副本 ｜ 默认不污染主目录 ｜ Handoff 可交回 Local
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:2.5s">
+        05 · 可视化审阅：把 diff 变成可操作的 Review pane
+        <div class="marker-underline"></div>
+      </div>
+      <div class="safe-box write-in" style="animation-delay:2.6s">
+        <div class="safe-row"><span class="safe-check">&#10003;</span><span>按未提交改动、分支差异、最近一轮改动切换查看范围。</span></div>
+        <div class="safe-row"><span class="safe-check">&#10003;</span><span>逐行内联批注：点某行的 <span class="code-term">+</span>，写反馈后让 Codex 按批注修改。</span></div>
+        <div class="safe-row"><span class="safe-check">&#10003;</span><span>按整份 diff、文件、hunk 暂存、取消暂存或回滚。</span></div>
+        <div class="safe-row"><span class="safe-check">&#10003;</span><span>满意后直接 commit、push、创建 Pull Request。</span></div>
+      </div>
+      <div class="big-warning write-in" style="animation-delay:2.7s">
+        审阅面板依赖 Git 仓库，显示的是仓库未提交状态，不一定只有 Codex 本轮改动。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:2.9s">
+        06 · CLI 给不了的四个工作台能力
+        <div class="marker-underline"></div>
+      </div>
+      <div class="compare-box write-in" style="animation-delay:3.0s">
+        <div class="compare-row"><span class="compare-label new">Review pane</span><span>逐行批注、按块回滚、可直接提交和开 PR。</span></div>
+        <div class="compare-row"><span class="compare-label">内置终端</span><span>与当前项目 / Worktree 共享同一目录，Codex 也能读终端输出。</span></div>
+        <div class="compare-row"><span class="compare-label">Actions</span><span>把测试、开发服务器、格式化等常用命令做成顶部按钮。</span></div>
+        <div class="compare-row"><span class="compare-label old">Automations</span><span>按天、周或线程计划自动运行；App 要开着，项目要在磁盘上可用。</span></div>
+      </div>
+      <div class="side-note green write-in" style="animation-delay:3.1s">
+        Local Environments 中的设置脚本可在新 Worktree 建立时补依赖，Actions 负责手动触发常用命令。
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:3.3s">
+        07 · 快捷键与斜杠命令：先记高频的
+        <div class="marker-underline"></div>
+      </div>
+      <div class="compare-box write-in" style="animation-delay:3.4s">
+        <div class="compare-row"><span class="compare-label new">Cmd + K</span><span>打开命令菜单；Windows 键位以 Settings &gt; Keyboard Shortcuts 为准。</span></div>
+        <div class="compare-row"><span class="compare-label">Cmd + N</span><span>新建线程。</span></div>
+        <div class="compare-row"><span class="compare-label">Cmd + J</span><span>切换内置终端。</span></div>
+        <div class="compare-row"><span class="compare-label">Cmd + Option + B</span><span>切换 Diff 审阅面板。</span></div>
+        <div class="compare-row"><span class="compare-label old">Ctrl + L</span><span>清空终端；不要把 Cmd + K 当清屏。</span></div>
+      </div>
+      <div class="config-box write-in" style="animation-delay:3.5s">
+        <span class="code-term">/status</span> 看线程、上下文和限额<br>
+        <span class="code-term">/review</span> 开代码审查<br>
+        <span class="code-term">/plan</span> 切换计划模式<br>
+        <span class="code-term">/mcp</span> 查看 MCP 状态
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:3.7s">
+        08 · 从打开到跑通第一个并行任务
+        <div class="marker-underline"></div>
+      </div>
+      <div class="attack-flow write-in" style="animation-delay:3.8s">
+        <div class="attack-step"><span class="step-num">1</span><span>选择 Git 项目，模式选 <span class="code-term">Worktree</span>。</span></div>
+        <div class="attack-step"><span class="step-num">2</span><span>发一个小任务：实现 TODO 或补 README 运行说明。</span></div>
+        <div class="attack-step"><span class="step-num">3</span><span>再开第二个 Worktree 线程，做另一项不相关的任务。</span></div>
+        <div class="attack-step"><span class="step-num">4</span><span>在 Review pane 逐行批注、按 hunk 暂存或回滚。</span></div>
+        <div class="attack-step"><span class="step-num">5</span><span>满意后 commit / push；需要主目录时用 Handoff 回 Local。</span></div>
+      </div>
+      <div class="summary-box write-in" style="animation-delay:3.9s">
+        <div class="summary-title">并行不打架的关键</div>
+        <div class="content">每个线程各自拥有 Worktree 副本；审阅通过之前，主目录保持干净。</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title write-in" style="animation-delay:4.1s">
+        09 · 桌面 App 速记
+        <div class="marker-underline"></div>
+      </div>
+      <div class="summary-box write-in" style="animation-delay:4.2s">
+        <div class="summary-title">左边挑去哪，中间让它干，右边看结果</div>
+        <div class="content">
+          <ul>
+            <li><span class="red-text">定位：</span>同一个 Codex，为并行与可视化打造的工作台。</li>
+            <li><span class="blue-text">模式：</span>Local 直改、Worktree 隔离、Cloud 后台。</li>
+            <li><span class="green-text">核心优势：</span>Review pane、共享终端、Actions、Automations。</li>
+            <li><span class="orange-text">并行规则：</span>同一项目多个任务，优先 Worktree；Git 是前提。</li>
+            <li><span class="purple-text">快捷入口：</span><span class="code-term">Cmd + K</span>、<span class="code-term">Cmd + N</span>、<span class="code-term">/status</span>、<span class="code-term">/review</span>。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider write-in" style="animation-delay:4.4s">
+      <span class="divider-text">把多个线程，放进同一张工作台</span>
+    </div>
+    <div class="content write-in" style="animation-delay:4.5s">
+      桌面 App 的价值不是少敲几条命令，而是让并行、隔离、审阅和自动化在同一窗口里形成稳定节奏。
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.write-in').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+
+    setTimeout(() => {
+      document.querySelectorAll('.write-in').forEach(el => {
+        el.style.animationPlayState = 'running';
+      });
+    }, 100);
+  });
+</script>
+
+</body>
+</html>
